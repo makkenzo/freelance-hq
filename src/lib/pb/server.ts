@@ -18,7 +18,11 @@ export async function createServerClient() {
     }
 
     pb.authStore.onChange((token, model) => {
-        const newCookie = pb.authStore.exportToCookie({ httpOnly: false });
+        const newCookie = pb.authStore.exportToCookie({
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Lax',
+        });
         cookieStore.set('pb_auth', newCookie);
     });
 
