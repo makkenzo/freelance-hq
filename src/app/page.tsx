@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/ui/button';
+import { Card, CardContent } from '@/ui/card';
 import { Clock, FileText, TrendingUp } from 'lucide-react';
 
 export default function FreelanceHQPage() {

@@ -1,7 +1,7 @@
 'use client';
 
-import { createProjectAction } from '@/actions/project-actions';
-import { Button } from '@/components/ui/button';
+import { createProjectAction } from '@/features/projects/actions';
+import { Button } from '@/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -11,9 +11,9 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/ui/dialog';
+import { Input } from '@/ui/input';
+import { Label } from '@/ui/label';
 import { useActionState, useEffect, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 

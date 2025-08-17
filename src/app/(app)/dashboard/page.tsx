@@ -1,8 +1,8 @@
-import { getProjectsAction } from '@/actions/project-actions';
-import { BottomListsPlaceholder } from '@/components/bottom-lists';
-import { CreateProjectDialog } from '@/components/create-project-dialog';
-import { KpiCard } from '@/components/kpi-card';
-import { RevenueChartPlaceholder } from '@/components/revenue-chart';
+import { getProjectsAction } from '@/features/projects/actions';
+import { BottomListsPlaceholder } from '@/features/projects/components/bottom-lists';
+import { CreateProjectDialog } from '@/features/projects/components/create-project-dialog';
+import { KpiCard } from '@/features/projects/components/kpi-card';
+import { RevenueChartPlaceholder } from '@/features/projects/components/revenue-chart';
 import { Briefcase, Clock, DollarSign, FileText } from 'lucide-react';
 
 export default async function DashboardPage() {

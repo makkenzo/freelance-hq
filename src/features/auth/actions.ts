@@ -1,7 +1,6 @@
 'use server';
 
 import { createServerClient } from '@/lib/pb/server';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export interface ActionState {
