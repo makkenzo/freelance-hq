@@ -42,13 +42,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                     <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
                         <Link
                             href="/dashboard"
-                            className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+                            className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
                         >
                             Dashboard
                         </Link>
                         <Link
-                            href="#"
-                            className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                            href="/projects"
+                            className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
                         >
                             Projects
                         </Link>

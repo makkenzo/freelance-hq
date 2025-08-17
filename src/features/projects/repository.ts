@@ -16,6 +16,21 @@ export const projectsRepository = {
         }
     },
 
+    async getById(projectId: string, userId: string): Promise<Project | null> {
+        const pb = await createServerClient();
+        try {
+            return await pb
+                .collection('projects')
+                .getFirstListItem<Project>(`id = "${projectId}" && user = "${userId}"`);
+        } catch (error: any) {
+            if (error.status === 404) {
+                return null;
+            }
+            console.error('Error fetching project by ID:', error);
+            throw error;
+        }
+    },
+
     async create(data: { name: string; client_name?: string; userId: string }): Promise<Project> {
         const pb = await createServerClient();
         return await pb.collection('projects').create<Project>({

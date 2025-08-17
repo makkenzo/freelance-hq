@@ -2,6 +2,7 @@
 
 import { createServerClient } from '@/lib/pb/server';
 import { revalidatePath } from 'next/cache';
+import { notFound } from 'next/navigation';
 
 import { createProjectSchema } from './lib/validation';
 import { projectsRepository } from './repository';
@@ -47,4 +48,19 @@ export async function createProjectAction(
         console.error(e);
         return { error: 'Failed to create the project.' };
     }
+}
+
+export async function getProjectByIdAction(projectId: string): Promise<Project> {
+    const pb = await createServerClient();
+    if (!pb.authStore.record?.id) {
+        notFound();
+    }
+
+    const project = await projectsRepository.getById(projectId, pb.authStore.record.id);
+
+    if (!project) {
+        notFound();
+    }
+
+    return project;
 }
