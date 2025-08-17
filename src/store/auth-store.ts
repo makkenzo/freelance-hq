@@ -19,7 +19,7 @@ export const defaultAuthState: AuthState = {
 };
 
 export const createAuthStore = (initState: AuthState = defaultAuthState) => {
-    return createStore<AuthStore>()((set, get) => ({
+    return createStore<AuthStore>()((set) => ({
         ...initState,
         setUser: (user) => {
             set({ user });

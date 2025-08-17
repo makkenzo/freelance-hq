@@ -4,12 +4,18 @@ import { CreateTaskDialog } from '@/features/tasks/components/create-task-dialog
 import { TaskList } from '@/features/tasks/components/task-list';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
-import { Card, CardContent } from '@/ui/card';
 import { Separator } from '@/ui/separator';
-import { Edit, PlusCircle } from 'lucide-react';
+import { Edit } from 'lucide-react';
 
-export default async function ProjectDetailsPage({ params }: { params: { id: string } }) {
-    const [project, tasks] = await Promise.all([getProjectByIdAction(params.id), getTasksByProjectIdAction(params.id)]);
+interface ProjectPageProps {
+    params: Promise<{
+        id: string;
+    }>;
+}
+
+export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
+    const { id: projectId } = await params;
+    const [project, tasks] = await Promise.all([getProjectByIdAction(projectId), getTasksByProjectIdAction(projectId)]);
 
     const statusVariant = (status: string) => {
         switch (status) {
