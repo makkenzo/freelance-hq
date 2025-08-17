@@ -59,7 +59,7 @@ export function CreateProjectDialog() {
                         </Label>
                         <Input id="client_name" name="client_name" className="col-span-3" />
                     </div>
-                    {state?.error && <p className="text-red-500 text-sm font-semibold col-span-4">{state.error}</p>}
+                    {state?.error && <p className="text-red-500 text-sm font-semibold col-span-1">{state.error}</p>}
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button type="button" variant="secondary">

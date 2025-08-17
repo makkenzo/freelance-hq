@@ -16,7 +16,7 @@ export const projectsRepository = {
         }
     },
 
-    async create(data: { name: string; client_name: string; userId: string }): Promise<Project> {
+    async create(data: { name: string; client_name?: string; userId: string }): Promise<Project> {
         const pb = await createServerClient();
         return await pb.collection('projects').create<Project>({
             ...data,

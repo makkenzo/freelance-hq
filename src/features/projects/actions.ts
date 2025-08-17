@@ -3,6 +3,7 @@
 import { createServerClient } from '@/lib/pb/server';
 import { revalidatePath } from 'next/cache';
 
+import { createProjectSchema } from './lib/validation';
 import { projectsRepository } from './repository';
 import type { CreateProjectActionState, Project } from './types';
 
@@ -24,14 +25,19 @@ export async function createProjectAction(
     }
 
     const name = formData.get('name') as string;
-    if (!name) {
-        return { error: 'Project name is required.' };
+    const client_name = formData.get('client_name') as string;
+
+    const validationResult = createProjectSchema.safeParse({ name, client_name });
+
+    if (!validationResult.success) {
+        const fieldErrors = validationResult.error.flatten().fieldErrors;
+        const nameErrorMessage = fieldErrors.name?.[0];
+        return { error: nameErrorMessage || 'An unknown validation error occurred.' };
     }
 
     try {
         await projectsRepository.create({
-            name,
-            client_name: formData.get('client_name') as string,
+            ...validationResult.data,
             userId: pb.authStore.model.id,
         });
 
