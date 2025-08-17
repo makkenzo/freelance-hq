@@ -1,3 +1,5 @@
+import AuthInitializer from '@/components/auth-initializer';
+import ZustandProvider from '@/providers';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
@@ -25,7 +27,11 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+            <ZustandProvider>
+                <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+                    <AuthInitializer /> {children}
+                </body>
+            </ZustandProvider>
         </html>
     );
 }
