@@ -1,6 +1,6 @@
 'use server';
 
-import { pb } from '@/lib/pb';
+import { createServerClient } from '@/lib/pb/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -9,14 +9,12 @@ export interface ActionState {
 }
 
 export async function loginAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
+    const pb = await createServerClient();
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
     try {
         await pb.collection('users').authWithPassword(email, password);
-
-        const authCookie = pb.authStore.exportToCookie({ httpOnly: false });
-        (await cookies()).set('pb_auth', authCookie);
     } catch (e: any) {
         console.error(e);
         return { error: 'Invalid credentials. Please try again.' };
@@ -26,6 +24,8 @@ export async function loginAction(prevState: ActionState, formData: FormData): P
 }
 
 export async function registerAction(prevState: ActionState, formData: FormData): Promise<ActionState> {
+    const pb = await createServerClient();
+
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
@@ -38,9 +38,6 @@ export async function registerAction(prevState: ActionState, formData: FormData)
     try {
         await pb.collection('users').create({ name, email, password, passwordConfirm });
         await pb.collection('users').authWithPassword(email, password);
-
-        const authCookie = pb.authStore.exportToCookie({ httpOnly: false });
-        (await cookies()).set('pb_auth', authCookie);
     } catch (e: any) {
         console.error(e);
         return { error: 'Failed to create account. Email may already be in use.' };

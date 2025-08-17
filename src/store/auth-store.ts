@@ -1,4 +1,4 @@
-import { pb } from '@/lib/pb';
+import { pb } from '@/lib/pb/client';
 import { RecordModel } from 'pocketbase';
 import { createStore } from 'zustand';
 
