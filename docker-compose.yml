@@ -1,0 +1,11 @@
+services:
+    freelance-hq:
+        container_name: freelance-hq
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: always
+        env_file:
+            - .env
+        ports:
+            - 22742:3000
