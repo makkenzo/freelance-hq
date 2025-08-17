@@ -1,42 +1,43 @@
 import { getProjectsAction } from '@/actions/project-actions';
+import { BottomListsPlaceholder } from '@/components/bottom-lists';
 import { CreateProjectDialog } from '@/components/create-project-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { KpiCard } from '@/components/kpi-card';
+import { RevenueChartPlaceholder } from '@/components/revenue-chart';
+import { Briefcase, Clock, DollarSign, FileText } from 'lucide-react';
 
 export default async function DashboardPage() {
     const projects = await getProjectsAction();
+    const activeProjects = projects.filter((p) => p.status === 'in_progress').length;
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="flex-1 space-y-4">
+            <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                    <p className="text-muted-foreground">Here is an overview of your projects.</p>
+                    <h2 className="text-3xl font-bold tracking-tight">Welcome back, Alex!</h2>
+                    <p className="text-muted-foreground">
+                        Here&apos;s what&apos;s happening with your freelance business today.
+                    </p>
                 </div>
-                <CreateProjectDialog />
+                <div className="flex items-center space-x-2">
+                    <CreateProjectDialog />
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {projects.length > 0 ? (
-                    projects.map((project) => (
-                        <Card key={project.id}>
-                            <CardHeader>
-                                <CardTitle>{project.name}</CardTitle>
-                                <CardDescription>{project.client_name || 'No client specified'}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <Badge variant={project.status === 'completed' ? 'default' : 'secondary'}>
-                                    {project.status.replace('_', ' ')}
-                                </Badge>
-                            </CardContent>
-                        </Card>
-                    ))
-                ) : (
-                    <Card className="col-span-full flex flex-col items-center justify-center p-8">
-                        <h3 className="text-xl font-semibold">No Projects Yet</h3>
-                        <p className="text-muted-foreground mt-2">Click &quot;Create Project&quot; to get started.</p>
-                    </Card>
-                )}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <KpiCard title="Total Revenue" value="$24,550" trend="↑ 8.2% vs last month" icon={DollarSign} />
+                <KpiCard
+                    title="Active Projects"
+                    value={activeProjects.toString()}
+                    trend={`Total ${projects.length} projects`}
+                    icon={Briefcase}
+                />
+                <KpiCard title="Pending Invoices" value="3" trend="$5,240 outstanding" icon={FileText} />
+                <KpiCard title="Hours Tracked" value="164h" trend="↑ 12% vs last month" icon={Clock} />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+                <RevenueChartPlaceholder />
+                <BottomListsPlaceholder />
             </div>
         </div>
     );
