@@ -1,5 +1,7 @@
-import { getTimeEntriesForTaskAction } from '@/features/time-tracking/actions';
+'use client';
+
 import { TimeTrackingSection } from '@/features/time-tracking/components/time-tracking-section';
+import { TimeEntry } from '@/features/time-tracking/types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/ui/accordion';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
@@ -9,9 +11,10 @@ import { TaskActions } from './task-actions';
 
 interface TaskListProps {
     tasks: Task[];
+    allTimeEntries: TimeEntry[];
 }
 
-export async function TaskList({ tasks }: TaskListProps) {
+export function TaskList({ tasks, allTimeEntries }: TaskListProps) {
     if (tasks.length === 0) {
         return (
             <Card>
@@ -49,8 +52,8 @@ export async function TaskList({ tasks }: TaskListProps) {
         <Card>
             <CardContent className="p-0">
                 <Accordion type="multiple" className="w-full">
-                    {tasks.map(async (task) => {
-                        const timeEntries = await getTimeEntriesForTaskAction(task.id);
+                    {tasks.map((task) => {
+                        const taskTimeEntries = allTimeEntries.filter((entry) => entry.task === task.id);
 
                         return (
                             <AccordionItem value={task.id} key={task.id}>
@@ -74,7 +77,7 @@ export async function TaskList({ tasks }: TaskListProps) {
                                     </div>
                                 </div>
                                 <AccordionContent>
-                                    <TimeTrackingSection task={task} initialTimeEntries={timeEntries} />
+                                    <TimeTrackingSection task={task} initialTimeEntries={taskTimeEntries} />
                                 </AccordionContent>
                             </AccordionItem>
                         );

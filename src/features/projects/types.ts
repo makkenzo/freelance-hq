@@ -25,3 +25,9 @@ export interface CreateProjectActionState {
     error?: string;
     success?: boolean;
 }
+
+export interface UpdateProjectActionState {
+    error?: string;
+    fieldErrors?: { [key: string]: string | undefined };
+    success?: boolean;
+}

@@ -4,9 +4,9 @@ import { createServerClient } from '@/lib/pb/server';
 import { revalidatePath } from 'next/cache';
 import { notFound } from 'next/navigation';
 
-import { createProjectSchema } from './lib/validation';
+import { createProjectSchema, updateProjectSchema } from './lib/validation';
 import { projectsRepository } from './repository';
-import type { CreateProjectActionState, Project } from './types';
+import type { CreateProjectActionState, Project, UpdateProjectActionState } from './types';
 
 export async function getProjectsAction(): Promise<Project[]> {
     const pb = await createServerClient();
@@ -64,4 +64,44 @@ export async function getProjectByIdAction(projectId: string): Promise<Project> 
     }
 
     return project;
+}
+
+export async function updateProjectAction(
+    projectId: string,
+    prevState: UpdateProjectActionState,
+    formData: FormData
+): Promise<UpdateProjectActionState> {
+    const pb = await createServerClient();
+    if (!pb.authStore.isValid) {
+        return { error: 'You must be logged in.' };
+    }
+
+    const rawData = Object.fromEntries(formData.entries());
+    const validationResult = updateProjectSchema.safeParse(rawData);
+
+    if (!validationResult.success) {
+        const fieldErrors = validationResult.error.format();
+        return {
+            error: 'Validation failed.',
+            fieldErrors: {
+                name: fieldErrors.name?._errors[0],
+                status: fieldErrors.status?._errors[0],
+                hourly_rate: fieldErrors.hourly_rate?._errors[0],
+            },
+        };
+    }
+
+    const { clientId, ...rest } = validationResult.data;
+    const dataToUpdate = { ...rest, client: clientId };
+
+    try {
+        await projectsRepository.update(projectId, dataToUpdate);
+        revalidatePath(`/projects/${projectId}`);
+        revalidatePath('/dashboard');
+        revalidatePath('/projects');
+        return { success: true };
+    } catch (e) {
+        console.error(e);
+        return { error: 'Failed to update the project.' };
+    }
 }

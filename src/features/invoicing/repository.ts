@@ -33,4 +33,60 @@ export const invoicesRepository = {
         });
         return totalItems;
     },
+
+    async getStats(userId: string): Promise<{ totalRevenue: number; pendingAmount: number; pendingCount: number }> {
+        const pb = await createServerClient();
+        const invoices = await pb.collection('invoices').getFullList<Invoice>({
+            filter: `user = "${userId}"`,
+            fields: 'status,total_amount',
+        });
+
+        let totalRevenue = 0;
+        let pendingAmount = 0;
+        let pendingCount = 0;
+
+        for (const invoice of invoices) {
+            if (invoice.status === 'paid') {
+                totalRevenue += invoice.total_amount;
+            }
+            if (invoice.status === 'sent' || invoice.status === 'overdue') {
+                pendingAmount += invoice.total_amount;
+                pendingCount++;
+            }
+        }
+
+        return { totalRevenue, pendingAmount, pendingCount };
+    },
+
+    async getMonthlyRevenue(userId: string): Promise<{ month: string; revenue: number }[]> {
+        const pb = await createServerClient();
+        const invoices = await pb.collection('invoices').getFullList<Invoice>({
+            filter: `user = "${userId}" && status = "paid"`,
+            fields: 'issue_date,total_amount',
+        });
+
+        const monthlyData: { [key: string]: number } = {};
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        invoices.forEach((invoice) => {
+            const date = new Date(invoice.issue_date);
+            const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+            if (!monthlyData[monthKey]) {
+                monthlyData[monthKey] = 0;
+            }
+            monthlyData[monthKey] += invoice.total_amount;
+        });
+
+        return Object.entries(monthlyData)
+            .map(([key, revenue]) => {
+                const [year, monthIndex] = key.split('-');
+                return {
+                    date: new Date(parseInt(year), parseInt(monthIndex)),
+                    month: `${monthNames[parseInt(monthIndex)]} '${year.slice(2)}`,
+                    revenue,
+                };
+            })
+            .sort((a, b) => a.date.getTime() - b.date.getTime())
+            .slice(-12);
+    },
 };

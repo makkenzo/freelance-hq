@@ -39,4 +39,14 @@ export const timeEntriesRepository = {
         const pb = await createServerClient();
         await pb.collection('time_entries').delete(entryId);
     },
+
+    async getTotalMinutesTracked(userId: string): Promise<number> {
+        const pb = await createServerClient();
+        const entries = await pb.collection('time_entries').getFullList<TimeEntry>({
+            filter: `user = "${userId}"`,
+            fields: 'duration',
+        });
+
+        return entries.reduce((acc, entry) => acc + entry.duration, 0);
+    },
 };

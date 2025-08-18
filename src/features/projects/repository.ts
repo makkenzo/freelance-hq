@@ -2,6 +2,13 @@ import { createServerClient } from '@/lib/pb/server';
 
 import type { Project } from './types';
 
+type ProjectUpdatePayload = {
+    name: string;
+    status: 'in_progress' | 'completed' | 'on_hold';
+    hourly_rate: number;
+    client?: string;
+};
+
 export const projectsRepository = {
     async getAllByUserId(userId: string): Promise<Project[]> {
         const pb = await createServerClient();
@@ -42,5 +49,14 @@ export const projectsRepository = {
             user: data.userId,
             status: 'in_progress',
         });
+    },
+
+    async update(projectId: string, data: ProjectUpdatePayload): Promise<Project> {
+        const pb = await createServerClient();
+        const payload = { ...data };
+        if (!payload.client || payload.client === 'none') {
+            delete payload.client;
+        }
+        return await pb.collection('projects').update<Project>(projectId, payload);
     },
 };
