@@ -11,6 +11,7 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: read
+            packages: write
 
         environment:
             name: production
@@ -34,6 +35,8 @@ jobs:
               with:
                   images: ${{ secrets.DOCKERHUB_USERNAME }}/freelance-hq
 
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v5
               with:
                   context: .
                   push: true
@@ -61,10 +64,9 @@ jobs:
                   script: |
                       cd ~/work/freelance-hq/
                       echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+                      echo "==> Pulling new image from Docker Hub..."
                       docker pull ${{ secrets.DOCKERHUB_USERNAME }}/freelance-hq:latest
-
                       echo "==> Restarting container..."
                       docker compose up -d
-
                       echo "==> Cleaning up old images..."
                       docker image prune -af
