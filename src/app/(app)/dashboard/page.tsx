@@ -1,6 +1,7 @@
 import { getClientsAction } from '@/features/clients/actions';
+import { RecentClientsList } from '@/features/clients/components/recent-clients-list';
+import { UpcomingTasksList } from '@/features/clients/components/upcoming-tasks-list';
 import { getProjectsAction } from '@/features/projects/actions';
-import { BottomListsPlaceholder } from '@/features/projects/components/bottom-lists';
 import { CreateProjectDialog } from '@/features/projects/components/create-project-dialog';
 import { KpiCard } from '@/features/projects/components/kpi-card';
 import { RevenueChartPlaceholder } from '@/features/projects/components/revenue-chart';
@@ -25,20 +26,23 @@ export default async function DashboardPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <KpiCard title="Total Revenue" value="$24,550" trend="↑ 8.2% vs last month" icon={DollarSign} />
                 <KpiCard
                     title="Active Projects"
                     value={activeProjects.toString()}
                     trend={`Total ${projects.length} projects`}
                     icon={Briefcase}
                 />
+
+                <KpiCard title="Total Revenue" value="$24,550" trend="↑ 8.2% vs last month" icon={DollarSign} />
                 <KpiCard title="Pending Invoices" value="3" trend="$5,240 outstanding" icon={FileText} />
                 <KpiCard title="Hours Tracked" value="164h" trend="↑ 12% vs last month" icon={Clock} />
             </div>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
                 <RevenueChartPlaceholder />
-                <BottomListsPlaceholder />
+
+                <UpcomingTasksList projects={projects} />
+                <RecentClientsList clients={clients} />
             </div>
         </div>
     );

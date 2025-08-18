@@ -1,3 +1,6 @@
+import { getTimeEntriesForTaskAction } from '@/features/time-tracking/actions';
+import { TimeTrackingSection } from '@/features/time-tracking/components/time-tracking-section';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/ui/accordion';
 import { Badge } from '@/ui/badge';
 import { Card, CardContent } from '@/ui/card';
 
@@ -8,7 +11,7 @@ interface TaskListProps {
     tasks: Task[];
 }
 
-export function TaskList({ tasks }: TaskListProps) {
+export async function TaskList({ tasks }: TaskListProps) {
     if (tasks.length === 0) {
         return (
             <Card>
@@ -45,27 +48,38 @@ export function TaskList({ tasks }: TaskListProps) {
     return (
         <Card>
             <CardContent className="p-0">
-                <ul className="divide-y">
-                    {tasks.map((task) => (
-                        <li key={task.id} className="flex items-center justify-between p-4 hover:bg-muted/50">
-                            <div className="flex items-center gap-4">
-                                {getStatusBadge(task.status)}
-                                <div className="flex flex-col gap-1">
-                                    <span className="font-semibold">{task.title}</span>
-                                    <span className="text-sm text-muted-foreground">
-                                        {task.due_date
-                                            ? `Due: ${new Date(task.due_date).toLocaleDateString()}`
-                                            : 'No due date'}
-                                    </span>
+                <Accordion type="multiple" className="w-full">
+                    {tasks.map(async (task) => {
+                        const timeEntries = await getTimeEntriesForTaskAction(task.id);
+
+                        return (
+                            <AccordionItem value={task.id} key={task.id}>
+                                <div className="flex items-center justify-between p-4 hover:bg-muted/50">
+                                    <AccordionTrigger className="w-full text-left p-0 hover:no-underline">
+                                        <div className="flex items-center gap-4">
+                                            {getStatusBadge(task.status)}
+                                            <div className="flex flex-col gap-1 items-start">
+                                                <span className="font-semibold">{task.title}</span>
+                                                <span className="text-sm text-muted-foreground">
+                                                    {task.due_date
+                                                        ? `Due: ${new Date(task.due_date).toLocaleDateString()}`
+                                                        : 'No due date'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <div className="flex items-center gap-2 pl-4">
+                                        <Badge variant={getPriorityVariant(task.priority)}>{task.priority}</Badge>
+                                        <TaskActions task={task} />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Badge variant={getPriorityVariant(task.priority)}>{task.priority}</Badge>
-                                <TaskActions task={task} />
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+                                <AccordionContent>
+                                    <TimeTrackingSection task={task} initialTimeEntries={timeEntries} />
+                                </AccordionContent>
+                            </AccordionItem>
+                        );
+                    })}
+                </Accordion>
             </CardContent>
         </Card>
     );
