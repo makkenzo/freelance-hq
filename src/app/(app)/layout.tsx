@@ -59,6 +59,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                         >
                             Clients
                         </Link>
+                        <Link
+                            href="/invoices"
+                            className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                        >
+                            Invoices
+                        </Link>
                     </nav>
                 </div>
             </div>

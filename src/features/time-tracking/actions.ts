@@ -10,7 +10,7 @@ import type { CreateTimeEntryActionState, TimeEntry } from './types';
 export async function getTimeEntriesForTaskAction(taskId: string): Promise<TimeEntry[]> {
     const pb = await createServerClient();
     if (!pb.authStore.record?.id) return [];
-    return timeEntriesRepository.getByTaskId(taskId, pb.authStore.record.id);
+    return timeEntriesRepository.getByProjectId(taskId, pb.authStore.record.id);
 }
 
 export async function createTimeEntryAction(

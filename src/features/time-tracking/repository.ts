@@ -3,11 +3,11 @@ import { createServerClient } from '@/lib/pb/server';
 import type { TimeEntry } from './types';
 
 export const timeEntriesRepository = {
-    async getByTaskId(taskId: string, userId: string): Promise<TimeEntry[]> {
+    async getByProjectId(projectId: string, userId: string): Promise<TimeEntry[]> {
         const pb = await createServerClient();
         try {
             return await pb.collection('time_entries').getFullList<TimeEntry>({
-                filter: `task = "${taskId}" && user = "${userId}"`,
+                filter: `project = "${projectId}" && user = "${userId}"`,
                 sort: '-entry_date',
             });
         } catch (error) {

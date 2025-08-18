@@ -1,3 +1,5 @@
+import { getInvoicesForProjectAction } from '@/features/invoicing/actions';
+import { InvoicingSection } from '@/features/invoicing/components/invoicing-section';
 import { getProjectByIdAction } from '@/features/projects/actions';
 import { getTasksByProjectIdAction } from '@/features/tasks/actions';
 import { CreateTaskDialog } from '@/features/tasks/components/create-task-dialog';
@@ -15,7 +17,11 @@ interface ProjectPageProps {
 
 export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
     const { id: projectId } = await params;
-    const [project, tasks] = await Promise.all([getProjectByIdAction(projectId), getTasksByProjectIdAction(projectId)]);
+    const [project, tasks, invoices] = await Promise.all([
+        getProjectByIdAction(projectId),
+        getTasksByProjectIdAction(projectId),
+        getInvoicesForProjectAction(projectId),
+    ]);
 
     const statusVariant = (status: string) => {
         switch (status) {
@@ -56,6 +62,8 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
                 </div>
                 <TaskList tasks={tasks} />
             </div>
+
+            <InvoicingSection projectId={project.id} invoices={invoices} />
         </div>
     );
 }

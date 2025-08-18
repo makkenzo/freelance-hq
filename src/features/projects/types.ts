@@ -13,6 +13,7 @@ export type Project = {
     client: string;
     status: 'in_progress' | 'completed' | 'on_hold';
     user: string;
+    hourly_rate: number;
     created: string;
     updated: string;
     expand?: {
