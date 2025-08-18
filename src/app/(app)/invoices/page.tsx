@@ -1,12 +1,10 @@
-import { invoicesRepository } from '@/features/invoicing/repository';
-import { createServerClient } from '@/lib/pb/server';
+import { getAllInvoicesAction } from '@/features/invoicing/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
+import Link from 'next/link';
 
 export default async function InvoicesPage() {
-    const pb = await createServerClient();
-    const userId = pb.authStore.record?.id;
-    const invoices = userId ? await invoicesRepository.getAllByUserId(userId) : [];
+    const invoices = await getAllInvoicesAction();
 
     return (
         <Card>
@@ -28,7 +26,11 @@ export default async function InvoicesPage() {
                     <TableBody>
                         {invoices.map((invoice) => (
                             <TableRow key={invoice.id}>
-                                <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
+                                <TableCell className="font-medium">
+                                    <Link href={`/invoices/${invoice.id}`} className="hover:underline text-primary">
+                                        {invoice.invoice_number}
+                                    </Link>
+                                </TableCell>
                                 <TableCell>{invoice.expand?.client.name}</TableCell>
                                 <TableCell>{invoice.expand?.project.name}</TableCell>
                                 <TableCell>{new Date(invoice.issue_date).toLocaleDateString()}</TableCell>

@@ -4,9 +4,10 @@ import { getProjectByIdAction } from '@/features/projects/actions';
 import { timeEntriesRepository } from '@/features/time-tracking/repository';
 import { createServerClient } from '@/lib/pb/server';
 import { revalidatePath } from 'next/cache';
+import { notFound } from 'next/navigation';
 
 import { invoicesRepository } from './repository';
-import type { Invoice } from './types';
+import type { Invoice, InvoiceStatus } from './types';
 
 export async function getInvoicesForProjectAction(projectId: string): Promise<Invoice[]> {
     const pb = await createServerClient();
@@ -68,4 +69,46 @@ export async function generateInvoiceForProjectAction(
         console.error(e);
         return { success: false, error: e.message || 'Failed to generate invoice.' };
     }
+}
+
+export async function getInvoiceByIdAction(invoiceId: string): Promise<Invoice> {
+    const pb = await createServerClient();
+    const userId = pb.authStore.record?.id;
+    if (!userId) notFound();
+
+    const invoice = await invoicesRepository.getById(invoiceId, userId);
+    if (!invoice) notFound();
+
+    return invoice;
+}
+
+export async function updateInvoiceStatusAction(
+    invoiceId: string,
+    status: InvoiceStatus
+): Promise<{ success: boolean; error?: string }> {
+    const pb = await createServerClient();
+    if (!pb.authStore.isValid) {
+        return { success: false, error: 'You must be logged in.' };
+    }
+
+    try {
+        const invoice = await invoicesRepository.updateStatus(invoiceId, status);
+
+        revalidatePath(`/invoices/${invoiceId}`);
+        revalidatePath('/invoices');
+        revalidatePath('/dashboard');
+        revalidatePath(`/projects/${invoice.project}`);
+        return { success: true };
+    } catch (e) {
+        console.error(e);
+        return { success: false, error: 'Failed to update invoice status.' };
+    }
+}
+
+export async function getAllInvoicesAction(): Promise<Invoice[]> {
+    const pb = await createServerClient();
+    const userId = pb.authStore.record?.id;
+    if (!userId) return [];
+
+    return invoicesRepository.getAllByUserId(userId);
 }

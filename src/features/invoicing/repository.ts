@@ -1,6 +1,6 @@
 import { createServerClient } from '@/lib/pb/server';
 
-import type { Invoice } from './types';
+import type { Invoice, InvoiceStatus } from './types';
 
 export const invoicesRepository = {
     async getAllByUserId(userId: string): Promise<Invoice[]> {
@@ -88,5 +88,25 @@ export const invoicesRepository = {
             })
             .sort((a, b) => a.date.getTime() - b.date.getTime())
             .slice(-12);
+    },
+
+    async getById(invoiceId: string, userId: string): Promise<Invoice | null> {
+        const pb = await createServerClient();
+        try {
+            return await pb
+                .collection('invoices')
+                .getFirstListItem<Invoice>(`id = "${invoiceId}" && user = "${userId}"`, {
+                    expand: 'client,project',
+                });
+        } catch (error: any) {
+            if (error.status === 404) return null;
+            console.error('Error fetching invoice by ID:', error);
+            throw error;
+        }
+    },
+
+    async updateStatus(invoiceId: string, status: InvoiceStatus): Promise<Invoice> {
+        const pb = await createServerClient();
+        return await pb.collection('invoices').update<Invoice>(invoiceId, { status });
     },
 };
