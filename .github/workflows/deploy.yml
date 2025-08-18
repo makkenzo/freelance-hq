@@ -5,37 +5,28 @@ on:
         branches:
             - main
 
-env:
-    REGISTRY: ghcr.io
-    IMAGE_NAME: ${{ github.repository }}
-
 jobs:
     build-and-push:
-        name: Build and Push Docker Image
+        name: Build and Push to Docker Hub
         runs-on: ubuntu-latest
         permissions:
             contents: read
-            packages: write
 
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Log in to GitHub Container Registry
+            - name: Log in to Docker Hub
               uses: docker/login-action@v3
               with:
-                  registry: ${{ env.REGISTRY }}
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.CR_PAT }}
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
 
             - name: Extract metadata for Docker
               id: meta
               uses: docker/metadata-action@v5
               with:
-                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-                  tags: |
-                      type=sha,prefix=
-                      type=raw,value=latest,enable={{is_default_branch}}
+                  images: ${{ secrets.DOCKERHUB_USERNAME }}/freelance-hq
 
             - name: Build and push Docker image
               uses: docker/build-push-action@v5
@@ -62,14 +53,11 @@ jobs:
                   host: ${{ secrets.SERVER_IP }}
                   username: ${{ secrets.SERVER_USER }}
                   key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  script_stop: true
                   script: |
                       cd ~/work/freelance-hq/
-
-                      echo "==> Logging into GHCR..."
-                      echo ${{ secrets.CR_PAT }} | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
-
-                      echo "==> Pulling new image..."
-                      docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+                      echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+                      docker pull ${{ secrets.DOCKERHUB_USERNAME }}/freelance-hq:latest
 
                       echo "==> Restarting container..."
                       docker compose up -d

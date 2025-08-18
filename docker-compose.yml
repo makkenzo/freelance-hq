@@ -1,7 +1,7 @@
 services:
     freelance-hq:
         container_name: freelance-hq
-        image: ghcr.io/makkenzo/freelance-hq:latest
+        image: makkenzo/freelance-hq:latest
         restart: always
         env_file:
             - .env
