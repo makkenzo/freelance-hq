@@ -9,6 +9,7 @@ export const projectsRepository = {
             return await pb.collection('projects').getFullList<Project>({
                 filter: `user = "${userId}"`,
                 sort: '-created',
+                expand: 'client',
             });
         } catch (error) {
             console.error('Error fetching projects:', error);
@@ -21,7 +22,9 @@ export const projectsRepository = {
         try {
             return await pb
                 .collection('projects')
-                .getFirstListItem<Project>(`id = "${projectId}" && user = "${userId}"`);
+                .getFirstListItem<Project>(`id = "${projectId}" && user = "${userId}"`, {
+                    expand: 'client',
+                });
         } catch (error: any) {
             if (error.status === 404) {
                 return null;
@@ -31,10 +34,11 @@ export const projectsRepository = {
         }
     },
 
-    async create(data: { name: string; client_name?: string; userId: string }): Promise<Project> {
+    async create(data: { name: string; client?: string; userId: string }): Promise<Project> {
         const pb = await createServerClient();
         return await pb.collection('projects').create<Project>({
-            ...data,
+            name: data.name,
+            client: data.client,
             user: data.userId,
             status: 'in_progress',
         });

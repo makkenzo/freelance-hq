@@ -26,9 +26,9 @@ export async function createProjectAction(
     }
 
     const name = formData.get('name') as string;
-    const client_name = formData.get('client_name') as string;
+    const clientId = formData.get('clientId') as string;
 
-    const validationResult = createProjectSchema.safeParse({ name, client_name });
+    const validationResult = createProjectSchema.safeParse({ name });
 
     if (!validationResult.success) {
         const fieldErrors = validationResult.error.flatten().fieldErrors;
@@ -38,7 +38,8 @@ export async function createProjectAction(
 
     try {
         await projectsRepository.create({
-            ...validationResult.data,
+            name: validationResult.data.name,
+            client: clientId,
             userId: pb.authStore.model.id,
         });
 

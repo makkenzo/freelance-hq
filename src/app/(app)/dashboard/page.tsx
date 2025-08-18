@@ -1,3 +1,4 @@
+import { getClientsAction } from '@/features/clients/actions';
 import { getProjectsAction } from '@/features/projects/actions';
 import { BottomListsPlaceholder } from '@/features/projects/components/bottom-lists';
 import { CreateProjectDialog } from '@/features/projects/components/create-project-dialog';
@@ -6,7 +7,7 @@ import { RevenueChartPlaceholder } from '@/features/projects/components/revenue-
 import { Briefcase, Clock, DollarSign, FileText } from 'lucide-react';
 
 export default async function DashboardPage() {
-    const projects = await getProjectsAction();
+    const [projects, clients] = await Promise.all([getProjectsAction(), getClientsAction()]);
     const activeProjects = projects.filter((p) => p.status === 'in_progress').length;
 
     return (
@@ -19,7 +20,7 @@ export default async function DashboardPage() {
                     </p>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <CreateProjectDialog />
+                    <CreateProjectDialog clients={clients} />
                 </div>
             </div>
 

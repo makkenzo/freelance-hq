@@ -35,7 +35,7 @@ export default async function ProjectDetailsPage({ params }: ProjectPageProps) {
             <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">
                     <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
-                    <p className="text-muted-foreground">Client: {project.client_name || 'N/A'}</p>
+                    <p className="text-muted-foreground">Client: {project.expand?.client?.name || 'N/A'}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                     <Badge variant={statusVariant(project.status)}>{project.status.replace('_', ' ')}</Badge>

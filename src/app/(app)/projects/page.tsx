@@ -1,3 +1,4 @@
+import { getClientsAction } from '@/features/clients/actions';
 import { getProjectsAction } from '@/features/projects/actions';
 import { CreateProjectDialog } from '@/features/projects/components/create-project-dialog';
 import { Badge } from '@/ui/badge';
@@ -5,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/ui/card';
 import Link from 'next/link';
 
 export default async function ProjectsPage() {
-    const projects = await getProjectsAction();
+    const [projects, clients] = await Promise.all([getProjectsAction(), getClientsAction()]);
 
     return (
         <div className="flex-1 space-y-4">
@@ -15,7 +16,7 @@ export default async function ProjectsPage() {
                     <p className="text-muted-foreground">Here is a list of all your projects.</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <CreateProjectDialog />
+                    <CreateProjectDialog clients={clients} />
                 </div>
             </div>
 
@@ -32,7 +33,9 @@ export default async function ProjectsPage() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-sm text-muted-foreground">Client: {project.client_name || 'N/A'}</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Client: {project.expand?.client?.name || 'N/A'}
+                                </p>
                             </CardContent>
                         </Card>
                     </Link>
@@ -43,7 +46,7 @@ export default async function ProjectsPage() {
                 <div className="flex flex-col items-center justify-center rounded-lg border border-dashed shadow-sm h-[400px]">
                     <h3 className="text-2xl font-bold tracking-tight">You have no projects yet.</h3>
                     <p className="text-sm text-muted-foreground mb-4">Get started by creating a new project.</p>
-                    <CreateProjectDialog />
+                    <CreateProjectDialog clients={clients} />
                 </div>
             )}
         </div>
