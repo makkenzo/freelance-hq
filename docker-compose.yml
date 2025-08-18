@@ -1,9 +1,7 @@
 services:
     freelance-hq:
         container_name: freelance-hq
-        build:
-            context: .
-            dockerfile: Dockerfile
+        image: ghcr.io/makkenzo/freelance-hq:latest
         restart: always
         env_file:
             - .env

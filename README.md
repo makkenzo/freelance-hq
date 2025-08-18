@@ -4,8 +4,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/makkenzo/freelance-hq/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/makkenzo/freelance-hq/ci.yml?branch=main&style=for-the-badge&logo=github&label=CI/CD" alt="Build Status">
+  <a href="https://github.com/makkenzo/freelance-hq/actions/workflows/deploy.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/makkenzo/freelance-hq/deploy.yml?branch=main&style=for-the-badge&logo=github&label=CI/CD" alt="Build Status">
   </a>
   <a href="https://github.com/makkenzo/freelance-hq/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/makkenzo/freelance-hq?style=for-the-badge&label=License&color=blue" alt="License">
