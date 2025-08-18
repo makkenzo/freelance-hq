@@ -2,7 +2,7 @@
 <p align="center">
   <strong>An all-in-one platform for freelancers to manage projects, clients, and finances with maximum efficiency.</strong>
 </p>
-
+ 
 <p align="center">
   <a href="https://github.com/makkenzo/freelance-hq/actions/workflows/deploy.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/makkenzo/freelance-hq/deploy.yml?branch=main&style=for-the-badge&logo=github&label=CI/CD" alt="Build Status">
