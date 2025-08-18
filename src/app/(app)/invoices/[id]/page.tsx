@@ -3,8 +3,13 @@ import { InvoiceActions } from '@/features/invoicing/components/invoice-actions'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 
-export default async function InvoiceDetailsPage({ params }: { params: { id: string } }) {
-    const invoice = await getInvoiceByIdAction(params.id);
+interface InvoiceDetailsPageProps {
+    params: Promise<{ id: string }>;
+}
+
+export default async function InvoiceDetailsPage({ params }: InvoiceDetailsPageProps) {
+    const { id: invoiceId } = await params;
+    const invoice = await getInvoiceByIdAction(invoiceId);
 
     return (
         <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">

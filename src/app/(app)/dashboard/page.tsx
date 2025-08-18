@@ -36,7 +36,9 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user.name}</h1>
-                    <p className="text-gray-600 mt-1">Here's what's happening with your freelance business today.</p>
+                    <p className="text-gray-600 mt-1">
+                        Here&apos;s what&apos;s happening with your freelance business today.
+                    </p>
                 </div>
                 <CreateProjectDialog clients={clients} />
             </div>

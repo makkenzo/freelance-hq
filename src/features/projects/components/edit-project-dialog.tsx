@@ -128,7 +128,7 @@ export function EditProjectDialog({ project, clients, open, onOpenChange }: Edit
                 <DialogHeader>
                     <DialogTitle>Edit Project</DialogTitle>
                     <DialogDescription>
-                        Make changes to your project here. Click save when you're done.
+                        Make changes to your project here. Click save when you&apos;re done.
                     </DialogDescription>
                 </DialogHeader>
                 <EditProjectForm

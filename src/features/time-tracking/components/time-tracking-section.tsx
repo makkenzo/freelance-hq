@@ -50,7 +50,9 @@ export function TimeTrackingSection({ task, initialTimeEntries }: TimeTrackingSe
                         <div>
                             <span>{new Date(entry.entry_date).toLocaleDateString()} - </span>
                             <span className="font-semibold">{formatDuration(entry.duration)}</span>
-                            {entry.notes && <p className="text-xs text-muted-foreground italic">"{entry.notes}"</p>}
+                            {entry.notes && (
+                                <p className="text-xs text-muted-foreground italic">&quot;{entry.notes}&quot;</p>
+                            )}
                         </div>
                         <Button
                             variant="ghost"
