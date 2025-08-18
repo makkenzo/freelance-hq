@@ -24,19 +24,39 @@
 
 The project is under active development.
 
-- **Current Features**
-    - ✅ Secure User Authentication (Registration & Login)
-    - ✅ Project Creation and Management
-    - ✅ Full CRUD Functionality for Tasks within Projects
-    - ✅ Status and Priority Management for Tasks
+- **Core Platform**
+    - ✅ Secure User Authentication (Registration & Login).
+    - ✅ Dynamic, real-time Dashboard with key performance indicators (KPIs).
+    - ✅ Responsive design for desktop and mobile devices.
+    - ✅ Instant feedback with toast notifications.
+- **Project & Task Management**
+    - ✅ Full CRUD for Projects (Create, Read, Update, Delete).
+    - ✅ Full CRUD for Tasks within projects, including status and priority.
+    - ✅ Interactive task lists with accordion-style details.
+- **Client Management**
+    - ✅ Client creation and management.
+    - ✅ Seamless association of clients with projects.
+- **Financials**
+    - ✅ Per-task time tracking with notes.
+    - ✅ Automated Invoice generation based on tracked time and hourly rates.
+    - ✅ Centralized view of all invoices with status tracking.
+    - ✅ Detailed invoice view and status management (Draft, Sent, Paid).
 
-- **Development Roadmap**
-    - **Q3 2025: Core Modules**
-        - 🚧 Full CRUD for client records and association with projects.
-        - 💡 Generate, track, and manage invoices based on project data.
-    - **Q4 2025: Advanced Tooling**
-        - 💡 Implement task-based time tracking and reporting.
-        - 💡 Introduce analytics for revenue, expenses, and profitability.
-    - **2026+: Platform Expansion**
-        - 💡 Introduce user roles, permissions, and shared workspaces.
-        - 💡 Connect with payment gateways and calendar services.
+#### Development Roadmap (What's Next)
+
+- **Phase 3: Polishing the Core & Financial Tooling (Q3 2025)**
+    - 🚧 Full CRUD for Clients (Edit/Delete).
+    - 🚧 Advanced Invoice Management (Edit/Delete).
+    - 💡 User Profile Page (change name/password).
+    - 💡 Centralized Settings Page (currency, user info).
+    - 💡 Dashboard enhancements (date filters, more charts).
+
+- **Phase 4: Advanced Business Management (Q4 2025)**
+    - 💡 In-depth Financial Reports (profit/loss, revenue by client).
+    - 💡 Expense Tracking module to calculate project profitability.
+    - 💡 Proposal & Estimate creation and management.
+
+- **Phase 5: Collaboration & Automation (2026+)**
+    - 🚀 Team functionality with user roles and permissions.
+    - 🚀 Client Portal for project tracking and invoice access.
+    - 🚀 Integrations with payment gateways (Stripe) and calendars (Google).

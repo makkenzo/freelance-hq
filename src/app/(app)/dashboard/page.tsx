@@ -1,76 +1,65 @@
 import { getClientsAction } from '@/features/clients/actions';
 import { RecentClientsList } from '@/features/clients/components/recent-clients-list';
 import { UpcomingTasksList } from '@/features/clients/components/upcoming-tasks-list';
+import { MetricCard } from '@/features/dashboard/components/metric-card';
 import { RevenueChart } from '@/features/invoicing/components/revenue-chart';
 import { invoicesRepository } from '@/features/invoicing/repository';
 import { getProjectsAction } from '@/features/projects/actions';
 import { CreateProjectDialog } from '@/features/projects/components/create-project-dialog';
-import { KpiCard } from '@/features/projects/components/kpi-card';
 import { timeEntriesRepository } from '@/features/time-tracking/repository';
 import { createServerClient } from '@/lib/pb/server';
 import { formatDuration } from '@/lib/utils';
-import { Briefcase, Clock, DollarSign, FileText } from 'lucide-react';
+import { Button } from '@/ui/button';
+import { Briefcase, Clock, DollarSign, FileText, Plus } from 'lucide-react';
 
 export default async function DashboardPage() {
     const pb = await createServerClient();
-    const userId = pb.authStore.record?.id;
+    const user = pb.authStore.record;
 
-    if (!userId) {
-        return <p>Please log in to see your dashboard.</p>;
+    if (!user) {
+        return null;
     }
 
-    const [projects, clients, invoiceStats, totalMinutes, monthlyRevenue] = await Promise.all([
+    const [invoiceStats, monthlyRevenueData, totalMinutesTracked, projects, clients] = await Promise.all([
+        invoicesRepository.getStats(user.id),
+        invoicesRepository.getMonthlyRevenue(user.id),
+        timeEntriesRepository.getTotalMinutesTracked(user.id),
         getProjectsAction(),
         getClientsAction(),
-        invoicesRepository.getStats(userId),
-        timeEntriesRepository.getTotalMinutesTracked(userId),
-        invoicesRepository.getMonthlyRevenue(userId),
     ]);
+
     const activeProjects = projects.filter((p) => p.status === 'in_progress').length;
+    const totalHoursTracked = formatDuration(totalMinutesTracked);
 
     return (
-        <div className="flex-1 space-y-4">
-            <div className="flex items-center justify-between space-y-2">
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Welcome back!</h2>
-                    <p className="text-muted-foreground">
-                        Here&apos;s what&apos;s happening with your freelance business today.
-                    </p>
+                    <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user.name}</h1>
+                    <p className="text-gray-600 mt-1">Here's what's happening with your freelance business today.</p>
                 </div>
-                <div className="flex items-center space-x-2">
-                    <CreateProjectDialog clients={clients} />
-                </div>
+                <CreateProjectDialog clients={clients} />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <KpiCard
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <MetricCard
                     title="Total Revenue"
-                    value={`$${invoiceStats.totalRevenue.toFixed(2)}`}
-                    trend="All time paid invoices"
+                    value={`$${invoiceStats.totalRevenue.toLocaleString()}`}
                     icon={DollarSign}
                 />
-                <KpiCard
-                    title="Active Projects"
-                    value={activeProjects.toString()}
-                    trend={`Total ${projects.length} projects`}
-                    icon={Briefcase}
-                />
-                <KpiCard
+                <MetricCard title="Active Projects" value={activeProjects.toString()} icon={Briefcase} />
+                <MetricCard
                     title="Pending Invoices"
                     value={invoiceStats.pendingCount.toString()}
-                    trend={`$${invoiceStats.pendingAmount.toFixed(2)} outstanding`}
+                    trend={`$${invoiceStats.pendingAmount.toLocaleString()} outstanding`}
                     icon={FileText}
                 />
-                <KpiCard
-                    title="Hours Tracked"
-                    value={formatDuration(totalMinutes)}
-                    trend="Total hours recorded"
-                    icon={Clock}
-                />
+                <MetricCard title="Hours Tracked" value={totalHoursTracked} icon={Clock} />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-                <RevenueChart data={monthlyRevenue} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <RevenueChart data={monthlyRevenueData} />
+
                 <UpcomingTasksList projects={projects} />
                 <RecentClientsList clients={clients} />
             </div>
