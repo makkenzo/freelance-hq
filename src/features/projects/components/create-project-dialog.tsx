@@ -2,6 +2,7 @@
 
 import { Client } from '@/features/clients/types';
 import { createProjectAction } from '@/features/projects/actions';
+import { useServerActionToast } from '@/hooks/use-server-action-toast';
 import { Button } from '@/ui/button';
 import {
     Dialog,
@@ -35,6 +36,18 @@ interface CreateProjectDialogProps {
 export function CreateProjectDialog({ clients }: CreateProjectDialogProps) {
     const [open, setOpen] = useState(false);
     const [state, formAction] = useActionState(createProjectAction, { error: undefined, success: false });
+
+    const { pending } = useFormStatus();
+
+    useServerActionToast(
+        state,
+        {
+            loading: 'Creating project...',
+            success: 'Project created successfully!',
+            error: (error) => `Failed to create project: ${error}`,
+        },
+        pending
+    );
 
     useEffect(() => {
         if (state.success) {

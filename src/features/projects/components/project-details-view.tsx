@@ -3,6 +3,7 @@
 import type { Client } from '@/features/clients/types';
 import { InvoicingSection } from '@/features/invoicing/components/invoicing-section';
 import type { Invoice } from '@/features/invoicing/types';
+import { CreateTaskDialog } from '@/features/tasks/components/create-task-dialog';
 import { TaskList } from '@/features/tasks/components/task-list';
 import type { Task } from '@/features/tasks/types';
 import { TimeEntry } from '@/features/time-tracking/types';
@@ -59,8 +60,11 @@ export function ProjectDetailsView({ project, tasks, invoices, clients, timeEntr
                 <Separator />
 
                 <div className="space-y-4">
-                    <h2 className="text-2xl font-semibold">Tasks</h2>
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-2xl font-semibold">Tasks</h2>
 
+                        <CreateTaskDialog projectId={project.id} />
+                    </div>
                     <TaskList tasks={tasks} allTimeEntries={timeEntries} />
                 </div>
 
