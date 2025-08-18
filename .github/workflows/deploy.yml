@@ -54,7 +54,6 @@ jobs:
 
         environment:
             name: production
-            url: ${{ secrets.SERVER_IP }}
 
         steps:
             - name: Deploy to Server via SSH
