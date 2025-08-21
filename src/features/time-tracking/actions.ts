@@ -43,10 +43,12 @@ export async function createTimeEntryAction(
 
     try {
         await timeEntriesRepository.create({
-            ...validationResult.data,
             taskId,
             projectId,
             userId: pb.authStore.model.id,
+            duration: validationResult.data.duration,
+            entry_date: validationResult.data.entry_date,
+            notes: validationResult.data.notes || '',
         });
         revalidatePath(`/projects/${projectId}`);
         return { success: true };

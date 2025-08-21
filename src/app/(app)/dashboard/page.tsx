@@ -10,19 +10,18 @@ import { CreateProjectDialog } from '@/features/projects/components/create-proje
 import { timeEntriesRepository } from '@/features/time-tracking/repository';
 import { createServerClient } from '@/lib/pb/server';
 import { formatDuration } from '@/lib/utils';
-import { Button } from '@/ui/button';
 import { Briefcase, Clock, DollarSign, FileText, Plus } from 'lucide-react';
 
 interface DashboardPageProps {
-    searchParams: {
+    searchParams: Promise<{
         period?: string;
-    };
+    }>;
 }
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
     const pb = await createServerClient();
     const user = pb.authStore.record;
-    const period = searchParams.period;
+    const period = (await searchParams).period;
 
     if (!user) {
         return null;

@@ -1,7 +1,7 @@
 export function getDateFilter(period?: string): string {
     if (!period) return '';
     const now = new Date();
-    let startDate = new Date();
+    const startDate = new Date();
 
     if (period === 'last_7_days') {
         startDate.setDate(now.getDate() - 7);
