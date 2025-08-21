@@ -11,6 +11,7 @@ import {
     FileText,
     HelpCircle,
     Home,
+    Lightbulb,
     Receipt,
     Settings,
     Square,
@@ -23,11 +24,11 @@ import { toast } from 'sonner';
 
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'Proposals', href: '/proposals', icon: Lightbulb },
     { name: 'Projects', href: '/projects', icon: Briefcase },
     { name: 'Invoices', href: '/invoices', icon: FileText },
     { name: 'Clients', href: '/clients', icon: Users },
     { name: 'Expenses', href: '/expenses', icon: Receipt },
-    { name: 'Time Tracking', href: '#', icon: Clock }, // Placeholder
     { name: 'Reports', href: '#', icon: BarChart3 }, // Placeholder
 ];
 
