@@ -2,7 +2,6 @@
 
 import { createServerClient } from '@/lib/pb/server';
 import { revalidatePath } from 'next/cache';
-import z from 'zod';
 
 import { createTaskSchema, updateTaskSchema } from './lib/validation';
 import { tasksRepository } from './repository';
@@ -28,9 +27,14 @@ export async function createTaskAction(
         return { error: 'You must be logged in to create a task.' };
     }
 
-    const title = formData.get('title') as string;
+    const rawData = {
+        title: formData.get('title'),
+        description: formData.get('description'),
+        priority: formData.get('priority'),
+        due_date: formData.get('due_date') || undefined,
+    };
 
-    const validationResult = createTaskSchema.safeParse({ title });
+    const validationResult = createTaskSchema.safeParse(rawData);
     if (!validationResult.success) {
         const fieldErrors = validationResult.error.format();
         return {
@@ -43,9 +47,9 @@ export async function createTaskAction(
 
     try {
         await tasksRepository.create({
-            title: validationResult.data.title,
+            ...validationResult.data,
             projectId: projectId,
-            userId: pb.authStore.model.id,
+            userId: pb.authStore.record!.id,
         });
 
         revalidatePath(`/projects/${projectId}`);
@@ -67,19 +71,26 @@ export async function updateTaskAction(
         return { error: 'You must be logged in.' };
     }
 
-    const title = formData.get('title') as string;
-    const status = formData.get('status') as TaskStatus;
+    const rawData = {
+        title: formData.get('title'),
+        description: formData.get('description'),
+        status: formData.get('status'),
+        priority: formData.get('priority'),
+        due_date: formData.get('due_date') || undefined,
+    };
 
-    const validationResult = updateTaskSchema.safeParse({ title, status });
+    const validationResult = updateTaskSchema.safeParse(rawData);
 
     if (!validationResult.success) {
         const fieldErrors = validationResult.error.format();
         return {
             error: 'Validation failed.',
-
             fieldErrors: {
                 title: fieldErrors.title?._errors[0],
                 status: fieldErrors.status?._errors[0],
+                priority: fieldErrors.priority?._errors[0],
+                due_date: fieldErrors.due_date?._errors[0],
+                description: fieldErrors.description?._errors[0],
             },
         };
     }

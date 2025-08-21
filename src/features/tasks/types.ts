@@ -29,6 +29,9 @@ export interface UpdateTaskActionState {
     fieldErrors?: {
         title?: string;
         status?: string;
+        priority?: string;
+        due_date?: string;
+        description?: string;
     };
     success?: boolean;
 }

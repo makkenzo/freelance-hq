@@ -1,11 +1,14 @@
 import { createServerClient } from '@/lib/pb/server';
+import z from 'zod';
 
+import { createTaskSchema, updateTaskSchema } from './lib/validation';
 import type { Task, TaskStatus } from './types';
 
-type TaskUpdatePayload = {
-    title?: string;
-    status?: TaskStatus;
+type TaskCreatePayload = z.infer<typeof createTaskSchema> & {
+    projectId: string;
+    userId: string;
 };
+type TaskUpdatePayload = z.infer<typeof updateTaskSchema>;
 
 export const tasksRepository = {
     async getAllByProjectId(projectId: string, userId: string): Promise<Task[]> {
@@ -21,20 +24,23 @@ export const tasksRepository = {
         }
     },
 
-    async create(data: { title: string; projectId: string; userId: string }): Promise<Task> {
+    async create(data: TaskCreatePayload): Promise<Task> {
         const pb = await createServerClient();
         return await pb.collection('tasks').create<Task>({
             title: data.title,
+            description: data.description,
             project: data.projectId,
             user: data.userId,
             status: 'todo',
-            priority: 'medium',
+            priority: data.priority,
+            due_date: data.due_date || null,
         });
     },
 
     async update(taskId: string, data: TaskUpdatePayload): Promise<Task> {
         const pb = await createServerClient();
-        return await pb.collection('tasks').update<Task>(taskId, data);
+        const dataToUpdate = { ...data, due_date: data.due_date || null };
+        return await pb.collection('tasks').update<Task>(taskId, dataToUpdate);
     },
 
     async delete(taskId: string): Promise<void> {

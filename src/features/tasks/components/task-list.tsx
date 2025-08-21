@@ -136,6 +136,11 @@ export function TaskList({ tasks, allTimeEntries }: TaskListProps) {
                                     </div>
                                 </div>
                                 <AccordionContent>
+                                    {task.description && (
+                                        <div className="px-4 pb-4 text-sm text-muted-foreground border-b">
+                                            <p>{task.description}</p>
+                                        </div>
+                                    )}
                                     <TimeTrackingSection task={task} initialTimeEntries={taskTimeEntries} />
                                 </AccordionContent>
                             </AccordionItem>
