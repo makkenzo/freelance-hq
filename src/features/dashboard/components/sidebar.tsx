@@ -4,7 +4,19 @@ import { createTimeEntryAction } from '@/features/time-tracking/actions';
 import { cn, formatSecondsToHMS } from '@/lib/utils';
 import { useTimeTrackingStore } from '@/providers/time-tracking-store-provider';
 import { Button } from '@/ui/button';
-import { BarChart3, Briefcase, Clock, FileText, HelpCircle, Home, Settings, Square, Users, Zap } from 'lucide-react';
+import {
+    BarChart3,
+    Briefcase,
+    Clock,
+    FileText,
+    HelpCircle,
+    Home,
+    Receipt,
+    Settings,
+    Square,
+    Users,
+    Zap,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { toast } from 'sonner';
@@ -14,6 +26,7 @@ const navigation = [
     { name: 'Projects', href: '/projects', icon: Briefcase },
     { name: 'Invoices', href: '/invoices', icon: FileText },
     { name: 'Clients', href: '/clients', icon: Users },
+    { name: 'Expenses', href: '/expenses', icon: Receipt },
     { name: 'Time Tracking', href: '#', icon: Clock }, // Placeholder
     { name: 'Reports', href: '#', icon: BarChart3 }, // Placeholder
 ];
