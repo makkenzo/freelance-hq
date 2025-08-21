@@ -1,3 +1,4 @@
+import { getDateFilter } from '@/lib/helpers';
 import { createServerClient } from '@/lib/pb/server';
 
 import type { Invoice, InvoiceStatus } from './types';
@@ -34,10 +35,15 @@ export const invoicesRepository = {
         return totalItems;
     },
 
-    async getStats(userId: string): Promise<{ totalRevenue: number; pendingAmount: number; pendingCount: number }> {
+    async getStats(
+        userId: string,
+        period?: string
+    ): Promise<{ totalRevenue: number; pendingAmount: number; pendingCount: number }> {
         const pb = await createServerClient();
+        const dateFilter = getDateFilter(period);
+
         const invoices = await pb.collection('invoices').getFullList<Invoice>({
-            filter: `user = "${userId}"`,
+            filter: `user = "${userId}"${dateFilter ? ' && ' + dateFilter : ''}`,
             fields: 'status,total_amount',
         });
 
@@ -60,8 +66,13 @@ export const invoicesRepository = {
 
     async getMonthlyRevenue(userId: string): Promise<{ month: string; revenue: number }[]> {
         const pb = await createServerClient();
+
+        const twelveMonthsAgo = new Date();
+        twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
+        const dateFilter = `issue_date >= "${twelveMonthsAgo.toISOString().slice(0, 19).replace('T', ' ')}"`;
+
         const invoices = await pb.collection('invoices').getFullList<Invoice>({
-            filter: `user = "${userId}" && status = "paid"`,
+            filter: `user = "${userId}" && status = "paid" && ${dateFilter}`,
             fields: 'issue_date,total_amount',
         });
 

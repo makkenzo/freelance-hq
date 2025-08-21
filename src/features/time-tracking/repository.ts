@@ -1,3 +1,4 @@
+import { getDateFilter } from '@/lib/helpers';
 import { createServerClient } from '@/lib/pb/server';
 
 import type { TimeEntry } from './types';
@@ -54,10 +55,12 @@ export const timeEntriesRepository = {
         await pb.collection('time_entries').delete(entryId);
     },
 
-    async getTotalMinutesTracked(userId: string): Promise<number> {
+    async getTotalMinutesTracked(userId: string, period?: string): Promise<number> {
         const pb = await createServerClient();
+        const dateFilter = getDateFilter(period);
+
         const entries = await pb.collection('time_entries').getFullList<TimeEntry>({
-            filter: `user = "${userId}"`,
+            filter: `user = "${userId}"${dateFilter ? ' && ' + dateFilter : ''}`,
             fields: 'duration',
         });
 

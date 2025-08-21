@@ -2,6 +2,7 @@ import { getClientsAction } from '@/features/clients/actions';
 import { RecentClientsList } from '@/features/clients/components/recent-clients-list';
 import { UpcomingTasksList } from '@/features/clients/components/upcoming-tasks-list';
 import { MetricCard } from '@/features/dashboard/components/metric-card';
+import { PeriodFilter } from '@/features/dashboard/components/period-filter';
 import { RevenueChart } from '@/features/invoicing/components/revenue-chart';
 import { invoicesRepository } from '@/features/invoicing/repository';
 import { getProjectsAction } from '@/features/projects/actions';
@@ -12,18 +13,25 @@ import { formatDuration } from '@/lib/utils';
 import { Button } from '@/ui/button';
 import { Briefcase, Clock, DollarSign, FileText, Plus } from 'lucide-react';
 
-export default async function DashboardPage() {
+interface DashboardPageProps {
+    searchParams: {
+        period?: string;
+    };
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
     const pb = await createServerClient();
     const user = pb.authStore.record;
+    const period = searchParams.period;
 
     if (!user) {
         return null;
     }
 
     const [invoiceStats, monthlyRevenueData, totalMinutesTracked, projects, clients] = await Promise.all([
-        invoicesRepository.getStats(user.id),
+        invoicesRepository.getStats(user.id, period),
         invoicesRepository.getMonthlyRevenue(user.id),
-        timeEntriesRepository.getTotalMinutesTracked(user.id),
+        timeEntriesRepository.getTotalMinutesTracked(user.id, period),
         getProjectsAction(),
         getClientsAction(),
     ]);
@@ -41,6 +49,10 @@ export default async function DashboardPage() {
                     </p>
                 </div>
                 <CreateProjectDialog clients={clients} />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-4">
+                <PeriodFilter />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -61,7 +73,6 @@ export default async function DashboardPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <RevenueChart data={monthlyRevenueData} />
-
                 <UpcomingTasksList projects={projects} />
                 <RecentClientsList clients={clients} />
             </div>
