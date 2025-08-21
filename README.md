@@ -20,43 +20,41 @@
 
 ---
 
-### Core Features & Development Roadmap
+### Core Features
 
-The project is under active development.
+This project is fully functional and includes a comprehensive set of features to manage your freelance operations.
 
-- **Core Platform**
-    - ✅ Secure User Authentication (Registration & Login).
-    - ✅ Dynamic, real-time Dashboard with key performance indicators (KPIs).
-    - ✅ Responsive design for desktop and mobile devices.
-    - ✅ Instant feedback with toast notifications.
-- **Project & Task Management**
-    - ✅ Full CRUD for Projects (Create, Read, Update, Delete).
-    - ✅ Full CRUD for Tasks within projects, including status and priority.
-    - ✅ Interactive task lists with accordion-style details.
-- **Client Management**
-    - ✅ Client creation and management.
-    - ✅ Seamless association of clients with projects.
-- **Financials**
-    - ✅ Per-task time tracking with notes.
-    - ✅ Automated Invoice generation based on tracked time and hourly rates.
-    - ✅ Centralized view of all invoices with status tracking.
-    - ✅ Detailed invoice view and status management (Draft, Sent, Paid).
+- **Client & Project Management**
+    - ✅ **Client Management:** Easily create and manage a central list of all your clients.
+    - ✅ **Project Management:** Full CRUD for projects, including status tracking (In Progress, Completed, On Hold) and client association.
+    - ✅ **Advanced Task Management:** Create and manage tasks within projects with descriptions, priorities (Low, Medium, High), and due dates.
 
-#### Development Roadmap (What's Next)
+- **Comprehensive Financial Toolkit**
+    - ✅ **Advanced Time Tracking:** Track time per task with both a **real-time timer** and manual entry options.
+    - ✅ **Proposal & Estimate Creation:** Build and manage professional proposals with detailed line items to send to potential clients.
+    - ✅ **Convert Proposals to Projects:** Convert an accepted proposal into a new project with all tasks pre-filled in a single click!
+    - ✅ **Intelligent Invoicing:** Automatically generate detailed, line-item invoices from uninvoiced time entries.
+    - ✅ **Invoice Management:** A centralized view of all invoices with status tracking (Draft, Sent, Paid, Overdue).
+    - ✅ **Expense Tracking:** Record business expenses, assign them to projects to calculate profitability, and upload receipts.
 
-- **Phase 3: Polishing the Core & Financial Tooling (Q3 2025)**
-    - 🚧 Full CRUD for Clients (Edit/Delete).
-    - 🚧 Advanced Invoice Management (Edit/Delete).
-    - 💡 User Profile Page (change name/password).
-    - 💡 Centralized Settings Page (currency, user info).
-    - 💡 Dashboard enhancements (date filters, more charts).
+---
 
-- **Phase 4: Advanced Business Management (Q4 2025)**
-    - 💡 In-depth Financial Reports (profit/loss, revenue by client).
-    - 💡 Expense Tracking module to calculate project profitability.
-    - 💡 Proposal & Estimate creation and management.
+### 🚀 Development Roadmap
 
-- **Phase 5: Collaboration & Automation (2026+)**
-    - 🚀 Team functionality with user roles and permissions.
-    - 🚀 Client Portal for project tracking and invoice access.
-    - 🚀 Integrations with payment gateways (Stripe) and calendars (Google).
+The project is under active development. Here's what's planned next:
+
+- **Phase 2: Polishing & Financial Enhancements (Q3 2025)**
+    - 🚧 **Full CRUD for Clients & Expenses:** Implement Edit and Delete functionality.
+    - 💡 **PDF Generation:** Export professional PDF documents for Invoices and Proposals.
+    - 💡 **User Profile & Settings:** A dedicated page for users to manage their profile, password, and application settings (e.g., currency, company details).
+    - 💡 **Dashboard Enhancements:** Add more charts and visualizations for a deeper data dive.
+
+- **Phase 3: Automation & Reporting (Q4 2025)**
+    - 💡 **Recurring Invoices:** Set up automatic invoice generation for clients on retainers.
+    - 💡 **Financial Reports:** Generate Profit & Loss statements and see detailed revenue breakdowns by client or project.
+    - 💡 **Payment Gateway Integration:** Integrate with Stripe or PayPal to allow clients to pay invoices directly online.
+
+- **Phase 4: Collaboration & Ecosystem (2026+)**
+    - 🚀 **Client Portal:** Provide clients with a secure portal to view project progress, approve proposals, and pay invoices.
+    - 🚀 **Team Functionality:** Introduce user roles and permissions to allow for collaboration.
+    - 🚀 **Calendar Integrations:** Sync task due dates with Google Calendar and other services.
