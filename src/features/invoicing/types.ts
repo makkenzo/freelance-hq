@@ -19,5 +19,16 @@ export type Invoice = {
             id: string;
             name: string;
         };
+        'invoice_items(invoice)': InvoiceItem[];
     };
+};
+
+export type InvoiceItem = {
+    id: string;
+    invoice: string;
+    description: string;
+    quantity: number;
+    unit_price: number;
+    total: number;
+    user: string;
 };

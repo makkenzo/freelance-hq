@@ -16,6 +16,20 @@ export const timeEntriesRepository = {
         }
     },
 
+    async getUninvoicedByProjectId(projectId: string, userId: string): Promise<TimeEntry[]> {
+        const pb = await createServerClient();
+        try {
+            return await pb.collection('time_entries').getFullList<TimeEntry>({
+                filter: `project = "${projectId}" && user = "${userId}" && invoice = null`,
+                sort: '-entry_date',
+                expand: 'task',
+            });
+        } catch (error) {
+            console.error('Error fetching uninvoiced time entries:', error);
+            return [];
+        }
+    },
+
     async create(data: {
         duration: number;
         entry_date: string;

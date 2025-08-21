@@ -1,10 +1,15 @@
 'use client';
 
+import { createTimeEntryAction } from '@/features/time-tracking/actions';
 import { TimeTrackingSection } from '@/features/time-tracking/components/time-tracking-section';
 import { TimeEntry } from '@/features/time-tracking/types';
+import { useTimeTrackingStore } from '@/providers/time-tracking-store-provider';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/ui/accordion';
 import { Badge } from '@/ui/badge';
+import { Button } from '@/ui/button';
 import { Card, CardContent } from '@/ui/card';
+import { Play, Square } from 'lucide-react';
+import { toast } from 'sonner';
 
 import type { Task } from '../types';
 import { TaskActions } from './task-actions';
@@ -15,6 +20,39 @@ interface TaskListProps {
 }
 
 export function TaskList({ tasks, allTimeEntries }: TaskListProps) {
+    const { activeTask, startTimer, stopTimer } = useTimeTrackingStore((state) => state);
+    const isAnyTaskActive = !!activeTask;
+
+    const handleStart = (task: Task) => {
+        if (isAnyTaskActive) {
+            toast.warning('Another timer is already running. Please stop it first.');
+            return;
+        }
+        startTimer(task);
+    };
+
+    const handleStop = async () => {
+        const { durationInMinutes, task } = stopTimer();
+
+        if (!task) return;
+
+        const formData = new FormData();
+        formData.append('duration', durationInMinutes.toString());
+        formData.append('entry_date', new Date().toISOString().split('T')[0]);
+
+        const result = await createTimeEntryAction(
+            { taskId: task.id, projectId: task.project },
+            { success: false },
+            formData
+        );
+
+        if (result.success) {
+            toast.success(`Time entry of ${durationInMinutes} min saved for "${task.title}"`);
+        } else {
+            toast.error(result.error || 'Failed to save time entry');
+        }
+    };
+
     if (tasks.length === 0) {
         return (
             <Card>
@@ -54,6 +92,7 @@ export function TaskList({ tasks, allTimeEntries }: TaskListProps) {
                 <Accordion type="multiple" className="w-full">
                     {tasks.map((task) => {
                         const taskTimeEntries = allTimeEntries.filter((entry) => entry.task === task.id);
+                        const isCurrentTaskActive = activeTask?.id === task.id;
 
                         return (
                             <AccordionItem value={task.id} key={task.id}>
@@ -72,6 +111,26 @@ export function TaskList({ tasks, allTimeEntries }: TaskListProps) {
                                         </div>
                                     </AccordionTrigger>
                                     <div className="flex items-center gap-2 pl-4">
+                                        {isCurrentTaskActive ? (
+                                            <Button
+                                                size="icon"
+                                                variant="destructive"
+                                                onClick={handleStop}
+                                                title="Stop Timer"
+                                            >
+                                                <Square className="h-4 w-4" />
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                size="icon"
+                                                variant="outline"
+                                                onClick={() => handleStart(task)}
+                                                disabled={isAnyTaskActive}
+                                                title="Start Timer"
+                                            >
+                                                <Play className="h-4 w-4" />
+                                            </Button>
+                                        )}
                                         <Badge variant={getPriorityVariant(task.priority)}>{task.priority}</Badge>
                                         <TaskActions task={task} />
                                     </div>

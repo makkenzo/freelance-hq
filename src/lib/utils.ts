@@ -16,3 +16,16 @@ export function formatDuration(minutes: number) {
     }
     return `${hours}h ${remainingMinutes}m`;
 }
+
+export function formatSecondsToHMS(seconds: number) {
+    const h = Math.floor(seconds / 3600)
+        .toString()
+        .padStart(2, '0');
+    const m = Math.floor((seconds % 3600) / 60)
+        .toString()
+        .padStart(2, '0');
+    const s = Math.floor(seconds % 60)
+        .toString()
+        .padStart(2, '0');
+    return `${h}:${m}:${s}`;
+}

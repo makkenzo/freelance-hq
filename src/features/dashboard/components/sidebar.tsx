@@ -1,10 +1,13 @@
 'use client';
 
-import { cn } from '@/lib/utils';
+import { createTimeEntryAction } from '@/features/time-tracking/actions';
+import { cn, formatSecondsToHMS } from '@/lib/utils';
+import { useTimeTrackingStore } from '@/providers/time-tracking-store-provider';
 import { Button } from '@/ui/button';
-import { BarChart3, Briefcase, Clock, FileText, HelpCircle, Home, Settings, Users, Zap } from 'lucide-react';
+import { BarChart3, Briefcase, Clock, FileText, HelpCircle, Home, Settings, Square, Users, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { toast } from 'sonner';
 
 const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -19,6 +22,50 @@ const bottomNavigation = [
     { name: 'Settings', href: '#', icon: Settings },
     { name: 'Help & Support', href: '#', icon: HelpCircle },
 ];
+
+const ActiveTimer = () => {
+    const { activeTask, elapsedSeconds, stopTimer } = useTimeTrackingStore((state) => state);
+
+    if (!activeTask) return null;
+
+    const handleStop = async () => {
+        const { durationInMinutes, task } = stopTimer();
+
+        if (!task) return;
+
+        const formData = new FormData();
+        formData.append('duration', durationInMinutes.toString());
+        formData.append('entryDate', new Date().toISOString().split('T')[0]);
+
+        const result = await createTimeEntryAction(
+            {
+                taskId: task.id,
+                projectId: task.project,
+            },
+            { success: false },
+            formData
+        );
+
+        if (result.success) {
+            toast.success(`Time entry of ${durationInMinutes} min saved for "${task.title}"`);
+        } else {
+            toast.error(result.error || 'Failed to save time entry');
+        }
+    };
+
+    return (
+        <div className="p-4 border-t border-gray-200 bg-amber-50">
+            <div className="text-sm font-semibold text-gray-800 truncate">{activeTask.title}</div>
+            <div className="flex items-center justify-between mt-2">
+                <div className="text-lg font-mono text-gray-900">{formatSecondsToHMS(elapsedSeconds)}</div>
+                <Button variant="destructive" size="sm" onClick={handleStop}>
+                    <Square className="mr-2 h-4 w-4" />
+                    Stop
+                </Button>
+            </div>
+        </div>
+    );
+};
 
 export function Sidebar() {
     const pathname = usePathname();
@@ -62,6 +109,8 @@ export function Sidebar() {
                     );
                 })}
             </nav>
+
+            <ActiveTimer />
 
             <div className="px-4 py-4 border-t border-gray-200 space-y-1">
                 {bottomNavigation.map((item) => (

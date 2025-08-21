@@ -2,6 +2,7 @@ import { getInvoiceByIdAction } from '@/features/invoicing/actions';
 import { InvoiceActions } from '@/features/invoicing/components/invoice-actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/card';
 import { Separator } from '@/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
 
 interface InvoiceDetailsPageProps {
     params: Promise<{ id: string }>;
@@ -10,6 +11,9 @@ interface InvoiceDetailsPageProps {
 export default async function InvoiceDetailsPage({ params }: InvoiceDetailsPageProps) {
     const { id: invoiceId } = await params;
     const invoice = await getInvoiceByIdAction(invoiceId);
+
+    const lineItems = invoice.expand?.['invoice_items(invoice)'] || [];
+    const subtotal = lineItems.reduce((acc, item) => acc + item.total, 0);
 
     return (
         <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -40,29 +44,49 @@ export default async function InvoiceDetailsPage({ params }: InvoiceDetailsPageP
                             </p>
                         </div>
                     </div>
+
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Description</TableHead>
+                                <TableHead className="text-center">Hours</TableHead>
+                                <TableHead className="text-center">Rate</TableHead>
+                                <TableHead className="text-right">Amount</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {lineItems.map((item) => (
+                                <TableRow key={item.id}>
+                                    <TableCell className="font-medium">{item.description}</TableCell>
+                                    <TableCell className="text-center">{item.quantity.toFixed(2)}</TableCell>
+                                    <TableCell className="text-center">${item.unit_price.toFixed(2)}</TableCell>
+                                    <TableCell className="text-right">${item.total.toFixed(2)}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+
                     <Separator />
-                    {/* В будущем здесь будет таблица с line items */}
-                    <div className="flex justify-between items-center py-4">
-                        <span className="text-muted-foreground">Description</span>
-                        <span className="font-semibold">Amount</span>
-                    </div>
-                    <div className="flex justify-between items-center border-t pt-4">
-                        <span className="text-muted-foreground">{invoice.notes}</span>
-                        <span className="font-semibold">${invoice.total_amount.toFixed(2)}</span>
-                    </div>
-                    <Separator />
+
                     <div className="flex justify-end">
-                        <div className="w-1/3 space-y-2">
+                        <div className="w-full max-w-xs space-y-2">
                             <div className="flex justify-between">
                                 <span>Subtotal</span>
-                                <span>${invoice.total_amount.toFixed(2)}</span>
+                                <span>${subtotal.toFixed(2)}</span>
                             </div>
-                            <div className="flex justify-between font-bold text-lg">
+                            <div className="flex justify-between font-bold text-lg border-t pt-2">
                                 <span>Total</span>
                                 <span>${invoice.total_amount.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
+
+                    {invoice.notes && (
+                        <div className="pt-4 border-t">
+                            <h4 className="font-semibold mb-1">Notes</h4>
+                            <p className="text-sm text-muted-foreground">{invoice.notes}</p>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>

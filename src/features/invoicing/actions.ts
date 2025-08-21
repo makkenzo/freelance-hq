@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { notFound } from 'next/navigation';
 
 import { invoicesRepository } from './repository';
-import type { Invoice, InvoiceStatus } from './types';
+import type { Invoice, InvoiceItem, InvoiceStatus } from './types';
 
 export async function getInvoicesForProjectAction(projectId: string): Promise<Invoice[]> {
     const pb = await createServerClient();
@@ -33,15 +33,40 @@ export async function generateInvoiceForProjectAction(
             return { success: false, error: 'Project must have a positive hourly rate. Please edit the project.' };
         }
 
-        const timeEntries = await timeEntriesRepository.getByProjectId(project.id, userId);
-        const totalMinutes = timeEntries.reduce((acc, entry) => acc + entry.duration, 0);
+        const timeEntries = await timeEntriesRepository.getUninvoicedByProjectId(project.id, userId);
 
-        if (totalMinutes === 0) {
-            return { success: false, error: 'No time tracked for this project.' };
+        if (timeEntries.length === 0) {
+            return { success: false, error: 'No new uninvoiced time tracked for this project.' };
         }
 
-        const totalHours = totalMinutes / 60;
-        const totalAmount = totalHours * project.hourly_rate;
+        const tasksWithTime: Record<string, { description: string; totalMinutes: number }> = {};
+
+        for (const entry of timeEntries) {
+            const taskId = entry.expand?.task?.id || 'general';
+            const taskTitle = entry.expand?.task?.title || project.name;
+            if (!tasksWithTime[taskId]) {
+                tasksWithTime[taskId] = { description: taskTitle, totalMinutes: 0 };
+            }
+            tasksWithTime[taskId].totalMinutes += entry.duration;
+        }
+
+        let totalAmount = 0;
+        const invoiceItemsData: Omit<InvoiceItem, 'id' | 'invoice' | 'user'>[] = [];
+
+        for (const taskId in tasksWithTime) {
+            const item = tasksWithTime[taskId];
+            const quantity = parseFloat((item.totalMinutes / 60).toFixed(2)); // часы
+            const unit_price = project.hourly_rate;
+            const total = parseFloat((quantity * unit_price).toFixed(2));
+
+            invoiceItemsData.push({
+                description: item.description,
+                quantity,
+                unit_price,
+                total,
+            });
+            totalAmount += total;
+        }
 
         const totalInvoices = await invoicesRepository.countAll(userId);
         const invoiceNumber = `INV-${(totalInvoices + 1).toString().padStart(4, '0')}`;
@@ -50,17 +75,29 @@ export async function generateInvoiceForProjectAction(
         const dueDate = new Date();
         dueDate.setDate(issueDate.getDate() + 30);
 
-        await invoicesRepository.create({
+        const newInvoice = await invoicesRepository.create({
             invoice_number: invoiceNumber,
             issue_date: issueDate.toISOString(),
             due_date: dueDate.toISOString(),
             status: 'draft',
             total_amount: totalAmount,
-            notes: `Invoice for work performed on project "${project.name}". Total hours tracked: ${totalHours.toFixed(2)}.`,
+            notes: `Invoice for work performed on project "${project.name}".`,
             project: project.id,
             client: project.client,
             user: userId,
         });
+
+        for (const itemData of invoiceItemsData) {
+            await pb.collection('invoice_items').create({
+                ...itemData,
+                invoice: newInvoice.id,
+                user: userId,
+            });
+        }
+
+        for (const entry of timeEntries) {
+            await pb.collection('time_entries').update(entry.id, { 'invoice+': newInvoice.id });
+        }
 
         revalidatePath(`/projects/${projectId}`);
         revalidatePath('/invoices');
