@@ -2,24 +2,42 @@
 
 import { Button } from '@/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/card';
-import { useTransition } from 'react';
+import { Label } from '@/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/ui/select';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
 
 import { generateInvoiceForProjectAction } from '../actions';
+import { InvoiceTemplate } from '../templates-types';
 import type { Invoice } from '../types';
 
 interface InvoicingSectionProps {
     projectId: string;
     invoices: Invoice[];
+    templates: InvoiceTemplate[];
 }
 
-export function InvoicingSection({ projectId, invoices }: InvoicingSectionProps) {
+export function InvoicingSection({ projectId, invoices, templates }: InvoicingSectionProps) {
+    const router = useRouter();
     const [isPending, startTransition] = useTransition();
+    const [selectedTemplate, setSelectedTemplate] = useState<string | undefined>(
+        templates.find((t) => t.is_default)?.id ?? templates[0]?.id
+    );
 
     const handleGenerate = () => {
+        if (templates.length > 0 && !selectedTemplate) {
+            toast.error('Please select a template to generate the invoice.');
+            return;
+        }
+
         startTransition(async () => {
-            const result = await generateInvoiceForProjectAction(projectId);
+            const result = await generateInvoiceForProjectAction(projectId, selectedTemplate);
             if (result.error) {
-                alert(result.error);
+                toast.error(result.error);
+            } else if (result.success && result.invoiceId) {
+                toast.success('Invoice generated successfully! Redirecting...');
+                router.push(`/invoices/${result.invoiceId}`);
             }
         });
     };
@@ -47,9 +65,36 @@ export function InvoicingSection({ projectId, invoices }: InvoicingSectionProps)
                     ))}
                     {invoices.length === 0 && <p className="text-sm text-muted-foreground">No invoices yet.</p>}
                 </ul>
-                <Button onClick={handleGenerate} disabled={isPending}>
-                    {isPending ? 'Generating...' : 'Generate Invoice from Tracked Time'}
-                </Button>
+                <div className="flex flex-col sm:flex-row items-end gap-4 pt-4 border-t">
+                    <div className="w-full sm:w-64 space-y-2">
+                        <Label htmlFor="template-select">Invoice Template</Label>
+                        <Select
+                            value={selectedTemplate}
+                            onValueChange={setSelectedTemplate}
+                            disabled={templates.length === 0}
+                        >
+                            <SelectTrigger id="template-select">
+                                <SelectValue placeholder="Select a template" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {templates.map((template) => (
+                                    <SelectItem key={template.id} value={template.id}>
+                                        {template.name} {template.is_default && '(Default)'}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <Button onClick={handleGenerate} disabled={isPending || templates.length === 0}>
+                        {isPending ? 'Generating...' : 'Generate Invoice from Tracked Time'}
+                    </Button>
+                </div>
+                {templates.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center pt-2">
+                        You need to create an invoice template in Settings before you can generate an invoice.
+                    </p>
+                )}
             </CardContent>
         </Card>
     );

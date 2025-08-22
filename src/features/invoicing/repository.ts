@@ -107,7 +107,7 @@ export const invoicesRepository = {
             return await pb
                 .collection('invoices')
                 .getFirstListItem<Invoice>(`id = "${invoiceId}" && user = "${userId}"`, {
-                    expand: 'client,project,invoice_items(invoice)',
+                    expand: 'client,project,invoice_items(invoice),template',
                 });
         } catch (error: any) {
             if (error.status === 404) return null;

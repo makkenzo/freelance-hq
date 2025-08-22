@@ -2,6 +2,7 @@
 
 import type { Client } from '@/features/clients/types';
 import { InvoicingSection } from '@/features/invoicing/components/invoicing-section';
+import { InvoiceTemplate } from '@/features/invoicing/templates-types';
 import type { Invoice } from '@/features/invoicing/types';
 import { CreateTaskDialog } from '@/features/tasks/components/create-task-dialog';
 import { TaskList } from '@/features/tasks/components/task-list';
@@ -11,7 +12,7 @@ import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Separator } from '@/ui/separator';
 import { Edit } from 'lucide-react';
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
 
 import type { Project } from '../types';
 import { EditProjectDialog } from './edit-project-dialog';
@@ -22,9 +23,17 @@ interface ProjectDetailsViewProps {
     invoices: Invoice[];
     clients: Client[];
     timeEntries: TimeEntry[];
+    templates: InvoiceTemplate[];
 }
 
-export function ProjectDetailsView({ project, tasks, invoices, clients, timeEntries }: ProjectDetailsViewProps) {
+export function ProjectDetailsView({
+    project,
+    tasks,
+    invoices,
+    clients,
+    timeEntries,
+    templates,
+}: ProjectDetailsViewProps) {
     const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 
     const statusVariant = (status: string) => {
@@ -68,7 +77,7 @@ export function ProjectDetailsView({ project, tasks, invoices, clients, timeEntr
                     <TaskList tasks={tasks} allTimeEntries={timeEntries} />
                 </div>
 
-                <InvoicingSection projectId={project.id} invoices={invoices} />
+                <InvoicingSection projectId={project.id} invoices={invoices} templates={templates} />
             </div>
 
             <EditProjectDialog

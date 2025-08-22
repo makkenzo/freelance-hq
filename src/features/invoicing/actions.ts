@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { notFound } from 'next/navigation';
 
 import { invoicesRepository } from './repository';
+import { templatesRepository } from './templates-repository';
 import type { Invoice, InvoiceItem, InvoiceStatus } from './types';
 
 export async function getInvoicesForProjectAction(projectId: string): Promise<Invoice[]> {
@@ -16,12 +17,21 @@ export async function getInvoicesForProjectAction(projectId: string): Promise<In
 }
 
 export async function generateInvoiceForProjectAction(
-    projectId: string
-): Promise<{ success: boolean; error?: string }> {
+    projectId: string,
+    templateId?: string
+): Promise<{ success: boolean; error?: string; invoiceId?: string }> {
     const pb = await createServerClient();
     const userId = pb.authStore.record?.id;
     if (!userId) {
         return { success: false, error: 'You must be logged in.' };
+    }
+
+    let finalTemplateId = templateId;
+    if (!finalTemplateId) {
+        const defaultTemplate = await templatesRepository.getDefaultByUserId(userId);
+        if (defaultTemplate) {
+            finalTemplateId = defaultTemplate.id;
+        }
     }
 
     try {
@@ -85,6 +95,7 @@ export async function generateInvoiceForProjectAction(
             project: project.id,
             client: project.client,
             user: userId,
+            template: finalTemplateId,
         });
 
         for (const itemData of invoiceItemsData) {
@@ -101,7 +112,7 @@ export async function generateInvoiceForProjectAction(
 
         revalidatePath(`/projects/${projectId}`);
         revalidatePath('/invoices');
-        return { success: true };
+        return { success: true, invoiceId: newInvoice.id };
     } catch (e: any) {
         console.error(e);
         return { success: false, error: e.message || 'Failed to generate invoice.' };

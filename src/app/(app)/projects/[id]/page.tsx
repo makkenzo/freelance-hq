@@ -1,5 +1,6 @@
 import { getClientsAction } from '@/features/clients/actions';
 import { getInvoicesForProjectAction } from '@/features/invoicing/actions';
+import { getTemplatesAction } from '@/features/invoicing/templates-actions';
 import { getProjectByIdAction } from '@/features/projects/actions';
 import { ProjectDetailsView } from '@/features/projects/components/project-details-view';
 import { getTasksByProjectIdAction } from '@/features/tasks/actions';
@@ -14,12 +15,13 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
     const resolvedParams = await params;
     const projectId = resolvedParams.id;
 
-    const [project, tasks, invoices, clients, timeEntries] = await Promise.all([
+    const [project, tasks, invoices, clients, timeEntries, templates] = await Promise.all([
         getProjectByIdAction(projectId),
         getTasksByProjectIdAction(projectId),
         getInvoicesForProjectAction(projectId),
         getClientsAction(),
         timeEntriesRepository.getByProjectId(projectId, userId),
+        getTemplatesAction(),
     ]);
 
     return (
@@ -29,6 +31,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
             invoices={invoices}
             clients={clients}
             timeEntries={timeEntries}
+            templates={templates}
         />
     );
 }

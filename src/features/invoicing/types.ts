@@ -1,5 +1,7 @@
 import type { ClientBase } from '@/features/projects/types';
 
+import { InvoiceTemplate } from './templates-types';
+
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue';
 
 export type Invoice = {
@@ -13,6 +15,7 @@ export type Invoice = {
     project: string;
     client: string;
     user: string;
+    template?: string;
     expand?: {
         client: ClientBase;
         project: {
@@ -20,6 +23,7 @@ export type Invoice = {
             name: string;
         };
         'invoice_items(invoice)': InvoiceItem[];
+        template?: InvoiceTemplate;
     };
 };
 

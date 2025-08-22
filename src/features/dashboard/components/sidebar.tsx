@@ -29,11 +29,11 @@ const navigation = [
     { name: 'Invoices', href: '/invoices', icon: FileText },
     { name: 'Clients', href: '/clients', icon: Users },
     { name: 'Expenses', href: '/expenses', icon: Receipt },
-    { name: 'Reports', href: '#', icon: BarChart3 }, // Placeholder
+    { name: 'Reports', href: '#', icon: BarChart3 },
 ];
 
 const bottomNavigation = [
-    { name: 'Settings', href: '#', icon: Settings },
+    { name: 'Settings', href: '/settings/profile', icon: Settings },
     { name: 'Help & Support', href: '#', icon: HelpCircle },
 ];
 
