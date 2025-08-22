@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { notFound } from 'next/navigation';
 
 interface ProposalDetailsPageProps {
-    params: { id: string };
+    params: Promise<{ id: string }>;
 }
 
 export default async function ProposalDetailsPage({ params }: ProposalDetailsPageProps) {
@@ -15,7 +15,7 @@ export default async function ProposalDetailsPage({ params }: ProposalDetailsPag
     const userId = pb.authStore.record?.id;
     if (!userId) notFound();
 
-    const proposal = await proposalsRepository.getById(params.id, userId);
+    const proposal = await proposalsRepository.getById((await params).id, userId);
     if (!proposal) notFound();
 
     const lineItems = proposal.expand?.['proposal_items(proposal)'] || [];
